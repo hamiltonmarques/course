@@ -40,7 +40,7 @@ public class ModuleServiceImpl implements ModuleService {
         moduleModel.setCourse(courseModel);
         moduleRepository.save(moduleModel);
 
-        return moduleMapper.toDTO(moduleRepository.save(moduleModel));
+        return moduleMapper.toDTO(moduleModel);
     }
 
     @Override
