@@ -34,7 +34,8 @@ public class CourseController {
     private CourseService courseService;
 
     @GetMapping
-    public ResponseEntity<?> getCourses(CourseFilter courseFilter, @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
+    public ResponseEntity<?> getCourses(CourseFilter courseFilter,
+                                        @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
         PageResponse<CourseDTO> pageResponse = courseService.findAll(courseFilter, pageable);
         return ResponseDTO.ok("Courses listed successfully", pageResponse);
     }

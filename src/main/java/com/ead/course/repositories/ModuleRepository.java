@@ -1,9 +1,12 @@
 package com.ead.course.repositories;
 
 import com.ead.course.models.ModuleModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ModuleRepository extends JpaRepository<ModuleModel, UUID> {
@@ -12,4 +15,8 @@ public interface ModuleRepository extends JpaRepository<ModuleModel, UUID> {
     // it will change to EAGER in runtime and data is displayed
     @EntityGraph(attributePaths = {"course"})
     ModuleModel findByTitle(String title);
+
+    Page<ModuleModel> findByCourseId(UUID courseId, Pageable pageable);
+
+    Optional<ModuleModel> findByIdAndCourseId(UUID moduleId, UUID courseId);
 }
