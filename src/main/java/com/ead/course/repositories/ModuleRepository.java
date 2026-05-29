@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ModuleRepository extends JpaRepository<ModuleModel, UUID> {
-
     // use EntityGraph to return fields that are LAZY in database
     // it will change to EAGER in runtime and data is displayed
     @EntityGraph(attributePaths = {"course"})
