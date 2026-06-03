@@ -19,3 +19,5 @@ spring:
 
   jackson:
     time-zone: America/Sao_Paulo
+    deserialization:
+      accept-float-as-int: false
