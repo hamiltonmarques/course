@@ -58,6 +58,10 @@ public class CourseModel implements Serializable {
     @Fetch(FetchMode.SUBSELECT)
     private Set<ModuleModel> modules;
 
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
+    private Set<CourseUserModel> courseUsers;
+
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
