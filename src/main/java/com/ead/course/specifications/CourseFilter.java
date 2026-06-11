@@ -14,4 +14,5 @@ public class CourseFilter {
     private UUID instructorId;
     private CourseStatus status;
     private CourseLevel level;
+    private UUID userId;
 }

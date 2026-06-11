@@ -3,8 +3,10 @@ package com.ead.course.specifications;
 import com.ead.course.enums.CourseLevel;
 import com.ead.course.enums.CourseStatus;
 import com.ead.course.models.CourseModel;
+import com.ead.course.models.CourseUserModel;
 import org.springframework.data.jpa.domain.Specification;
 
+import javax.persistence.criteria.Join;
 import java.util.UUID;
 
 public class CourseSpecification {
@@ -26,6 +28,10 @@ public class CourseSpecification {
 
         if (filter.getName() != null && !filter.getName().isBlank()) {
             spec = spec.and(nameLike(filter.getName()));
+        }
+
+        if (filter.getUserId() != null) {
+            spec = spec.and(hasUserId(filter.getUserId()));
         }
 
         return spec;
@@ -52,5 +58,13 @@ public class CourseSpecification {
                         cb.lower(root.get("name")),
                         "%" + name.toLowerCase() + "%"
                 );
+    }
+
+    public static Specification<CourseModel> hasUserId(UUID id) {
+        return (root, query, cb) -> {
+            query.distinct(true);
+            Join<CourseModel, CourseUserModel> join = root.join("courseUsers");
+            return cb.equal(join.get("userId"), id);
+        };
     }
 }

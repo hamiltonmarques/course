@@ -1,18 +1,24 @@
 package com.ead.course.api.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ApiResponse<T> {
 
-    private final LocalDateTime timestamp;
-    private final int status;
-    private final String message;
+    private LocalDateTime timestamp;
+    private int status;
+    private String message;
     private Map<String, String> errors;
     private T data;
 
