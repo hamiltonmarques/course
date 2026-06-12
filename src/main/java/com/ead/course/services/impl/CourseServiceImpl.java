@@ -1,10 +1,15 @@
 package com.ead.course.services.impl;
 
 import com.ead.course.api.response.PageResponse;
+import com.ead.course.clients.AuthUserApiClient;
 import com.ead.course.dtos.CourseCreateDTO;
 import com.ead.course.dtos.CourseDTO;
 import com.ead.course.dtos.CourseUpdateDTO;
 import com.ead.course.dtos.PageDTO;
+import com.ead.course.dtos.UserDTO;
+import com.ead.course.enums.UserStatus;
+import com.ead.course.enums.UserType;
+import com.ead.course.exception.business.InvalidUserException;
 import com.ead.course.exception.notfound.CourseNotFoundException;
 import com.ead.course.mappers.CourseMapper;
 import com.ead.course.models.CourseModel;
@@ -29,8 +34,12 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     CourseMapper courseMapper;
 
+    @Autowired
+    AuthUserApiClient authUserApiClient;
+
     @Override
     public CourseDTO createCourse(CourseCreateDTO courseCreateDTO) {
+        validateUser(courseCreateDTO.getInstructorId());
         CourseModel courseModel = courseMapper.toModel(courseCreateDTO);
         courseRepository.save(courseModel);
         return courseMapper.toDTO(courseModel);
@@ -81,5 +90,17 @@ public class CourseServiceImpl implements CourseService {
     private CourseModel findCourse(UUID id) {
         return courseRepository.findById(id)
                 .orElseThrow(CourseNotFoundException::new);
+    }
+
+    private void validateUser(UUID userId) {
+        UserDTO user = authUserApiClient.getUser(userId);
+
+        if (user.getType() == UserType.STUDENT) {
+            throw new InvalidUserException("Only admin or instructor users can create a course");
+        }
+
+        if (user.getStatus() == UserStatus.BLOCKED) {
+            throw new InvalidUserException("Only active users can create a course");
+        }
     }
 }
