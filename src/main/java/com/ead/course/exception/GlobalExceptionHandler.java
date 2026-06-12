@@ -1,11 +1,14 @@
 package com.ead.course.exception;
 
 import com.ead.course.dtos.ResponseDTO;
+import com.ead.course.exception.business.BusinessException;
 import com.ead.course.exception.notfound.NotFoundException;
+import com.ead.course.exception.validation.AlreadyExistsException;
 import com.ead.course.validation.ValidationMessage;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
@@ -20,12 +23,36 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<?> handleNotFound(NotFoundException ex) {
         return ResponseDTO.notFound(ex.getMessage());
+    }
+
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ResponseEntity<?> handleAlreadyExists(AlreadyExistsException ex) {
+        return ResponseDTO.conflictError(ex.getMessage());
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<?> handleBusiness(BusinessException ex) {
+        return ResponseDTO.badRequest(ex.getMessage());
+    }
+
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<?> handleExternalApi(ExternalApiException ex) {
+        log.error("ExternalApiException Origin: {}, Status: {}, Message: {}",
+                ex.getOriginApi(), ex.getHttpStatus(), ex.getMessage());
+        return ResponseEntity.status(ex.getHttpStatus()).body(ex.getApiResponse());
+    }
+
+    @ExceptionHandler(ExternalApiUnavailableException.class)
+    public ResponseEntity<?> handleExternalApiUnavailable(ExternalApiUnavailableException ex) {
+        log.error(ex.getMessage(), ex.getCause());
+        return ResponseDTO.serviceUnavailable(ex.getMessage());
     }
 
     @ExceptionHandler(MissingPathVariableException.class)
@@ -133,8 +160,8 @@ public class GlobalExceptionHandler {
         // always return a generic message for client
         // enable logs in production only
         // log.error("unexpected internal error", ex);
-        System.out.println(ex.getClass().getName());
-        System.out.println(ex.getMessage());
+        log.error(ex.getClass().getName());
+        log.error(ex.getMessage());
 
         return ResponseDTO.internalError("Unexpected internal error");
     }

@@ -42,4 +42,9 @@ public class ResponseDTO {
         ApiResponse<T> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), message, errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
+    public static <T> ResponseEntity<ApiResponse<T>> serviceUnavailable(String message) {
+        ApiResponse<T> response = new ApiResponse<>(HttpStatus.SERVICE_UNAVAILABLE.value(), message, null);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+    }
 }
