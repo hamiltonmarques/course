@@ -3,6 +3,7 @@ package com.ead.course.clients;
 import com.ead.course.exception.ExternalApiUnavailableException;
 import io.netty.channel.ChannelOption;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -23,13 +24,20 @@ public class WebClientConfig {
             .responseTimeout(Duration.ofSeconds(10));
 
     @Bean
+    @LoadBalanced
+    public WebClient.Builder loadBalancedWebClientBuilder() {
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(HTTP_CLIENT));
+    }
+
+    @Bean
     public WebClient courseWebClient(
+            WebClient.Builder loadBalancedWebClientBuilder,
             @Value("${app.clients.auth-user-api.base-url}") String baseUrl,
             @Value("${app.clients.auth-user-api.label}") String apiLabel) {
 
-        return WebClient.builder()
+        return loadBalancedWebClientBuilder
                 .baseUrl(baseUrl)
-                .clientConnector(new ReactorClientHttpConnector(HTTP_CLIENT))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .filter(errorFilter(apiLabel))
                 .build();
